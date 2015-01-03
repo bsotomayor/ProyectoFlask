@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+
+{% block content %}
+	<div align="center">
+		<h1>Proyecto Imagenes</h1>
+		<br>
+		<h4>Ingrese Usuario y Contraseña</h4>
+		{% if error %}
+		<p class="error"><strong>Error:</strong> {{ error }} </p>
+		{% endif %}
+		<br/>
+		
+		<form action="" method="post" style="width: 400px;">
+			<div class="input-group">
+				<span class="input-group-addon">@</span>
+				<input type="text" class="form-control" placeholder="Username" name="username" value"{{ request.form.username }}"> 
+			</div>
+			<br/>
+			<div class="input-group">
+				<span class="input-group-addon">* </span>
+				<input type="password" class="form-control" placeholder="Password" name="password" value"{{ request.form.password }}"> 
+				
+			</div>
+			<br/><br/>
+
+			<input class="btn btn-default" type="submit" value="Log in">
+		</form>
+
+		{% for message in get_flashed_messages() %}
+		<div class=flash>
+			{{ message }}
+		</div>
+		{% endfor %}
+	</div>
+{% endblock content %}

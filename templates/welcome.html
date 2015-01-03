@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+	{% block head %}
+	{{ super() }}
+	{% endblock head %}
+
+	{% block content %}
+		<div class="hero-unit" align="center">
+			{% if username %}
+		    <h4>Bienvenido, <strong> {{ username }} </strong>!</h4>
+		    {% endif %}
+		    <br/>
+		    <img src="http://flask.pocoo.org/docs/0.10/_static/flask.png">
+			<br>
+			<form method="get" action="{{ url_for('form_agregar')}}">
+				<input type="submit" value = "Agregar Fotografía"/>
+			</form>
+		    <br/><br/><br/>
+		    <p>Welcome to my Flask homework!</p>
+		    <br/>
+		    <a class="btn btn-primary btn" href="{{ url_for('logout') }}">Logout
+			</a>
+	    </div>
+	{% endblock content %}
