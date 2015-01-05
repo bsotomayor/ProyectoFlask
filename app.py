@@ -8,7 +8,8 @@ import string
 import os
 from flask import redirect
 from werkzeug import secure_filename
-
+import sqlite3 as lite
+from time import gmtime, strftime
 
 app = Flask(__name__)
 
@@ -85,30 +86,46 @@ def logout():
 @app.route('/form_agregar', methods=['POST'])
 def form_agregar(): 
 	id_usuario = request.form['id_oculto']
-	return render_template('form.html', id_usuario=id_usuario) # Se pasa la Pass del Usuario para recordar de quien es la foto!!!
+	username = request.form['username_oculto']
+	return render_template('form.html', id_usuario=id_usuario, username=username) # Se pasa la Pass del Usuario para recordar de quien es la foto!!!
 
 @app.route('/form_agregar_foto', methods=['POST'])
 def form_agregar_foto(): 
 	id_usuario = request.form['id_oculto']
+	username = request.form['username']
 	titulo_foto = request.form['title']
 	tema_foto = request.form['tema']
 	camara_foto = request.form['camara']
 	description_foto = request.form['description']
 	file = request.files['file_img']
+	#Se verifica que se ingresan todos los campos,
+	if titulo_foto =="" or tema_foto =="" or description_foto =="" or camara_foto =="": 
+		error = "Debe rellenar todos los espacios."
+		#Se redirige al formulario nuevamente
+		return render_template('form.html', id_usuario=id_usuario, error=error)
 	if file and allowed_file(file.filename):
 		NombreArchivo = secure_filename(file.filename)
 		file.save(os.path.join(app.config['UPLOAD_FOLDER'], NombreArchivo))
-	
-	archi=open('datos.txt','w')
-	archi.close()
-	archi=open('datos.txt','a')
-	archi.write(id_usuario+'\n')
-	archi.write(titulo_foto+'\n')
-	archi.write(tema_foto+'\n')
-	archi.write(camara_foto+'\n')
-	archi.write(description_foto+'\n')
-	archi.close()
-	return redirect (url_for('log'))	
+		fin = open('uploads/'+NombreArchivo, "rb")
+		img = fin.read()
+		fin.close()
+		binary = lite.Binary(img)
+		datetime = strftime("%Y-%m-%d %H:%M:%S")
+		db = get_db()
+		c=db.cursor()
+		c.execute("insert into imagen (nombre, fecha_subida, tema, descripcion, camara, id_usuario, data, nombre_archivo) values (?, ?, ?, ?, ?,?, ?, ?)",(titulo_foto, datetime, tema_foto, description_foto, camara_foto, id_usuario,binary,NombreArchivo ))
+		db.commit()
+		#con = lite.connect('tarea.db')
+		#cur = con.cursor()    
+		#cur.execute('select data from imagen where id_usuario = ?',[id_usuario])
+		#data = cur.fetchone()[0]
+		#fout = open('woman2.jpg','wb')
+		#fout.write(data)
+		return render_template("welcome.html", id=id_usuario, username=username)
+	else:
+		error = "No se adjuntó una fotografia."
+		#Se redirige al formulario nuevamente
+		return render_template('form.html', id_usuario=id_usuario, error=error)
 	
 @app.route('/form_crear_user', methods=['GET']) #Permite ir al formulario de creacion de usuarios
 def form_crear_user():  
