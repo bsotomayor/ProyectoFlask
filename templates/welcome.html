@@ -8,11 +8,16 @@
 			{% if username %}
 		    <h4>Bienvenido, <strong> {{ username }} </strong>!</h4>
 		    {% endif %}
+			
 		    <br/>
 		    <img src="http://flask.pocoo.org/docs/0.10/_static/flask.png">
 			<br>
-			<form method="get" action="{{ url_for('form_agregar')}}">
+			<form method="post" action="{{ url_for('form_agregar')}}">
 				<input type="submit" value = "Agregar Fotografía"/>
+				<br>
+				<div class="col-sm-10">
+                <input type="text" name="id_oculto" value = "{{ id }}" style="display:none;">
+				</div>
 			</form>
 		    <br/><br/><br/>
 		    <p>Welcome to my Flask homework! </p>

@@ -4,7 +4,7 @@
 {% block title %}Formulario de creación{% endblock title %}
 
 {% block content %}
-
+		<form method="post" action="{{ url_for('form_agregar_foto')}}" enctype="multipart/form-data">
         <div class="form-group">
             <label for="title" class="col-sm-2 control-label">Título</label>
             <div class="col-sm-10">
@@ -24,9 +24,9 @@
             </div>
         </div>
 		<div class="form-group">
-            <label for="description" class="col-sm-2 control-label">Cámara:</label>
+            <label for="camara" class="col-sm-2 control-label">Cámara:</label>
             <div class="col-sm-10">
-                <input class="form-control" type="text" name="description" placeholder="Ingrese el modelo de la Cámara">
+                <input class="form-control" type="text" name="camara" placeholder="Ingrese el modelo de la Cámara">
             </div>
         </div>
         <div class="form-group">
@@ -41,5 +41,8 @@
             <input type="submit" value="Guardar Fotografía" class="btn btn-default">
             </div>
         </div>
-  
+		<div class="col-sm-10">
+                <input type="text" name="id_oculto" value = "{{ id_usuario }}" style="display:none;">
+		</div>
+		</form>
 {% endblock content %}

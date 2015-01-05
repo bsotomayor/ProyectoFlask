@@ -5,7 +5,10 @@ from werkzeug.security import generate_password_hash
 import hashlib
 import random
 import string
+import os
 from flask import redirect
+from werkzeug import secure_filename
+
 
 app = Flask(__name__)
 
@@ -17,6 +20,10 @@ app.config.update(dict(
 
 app.config['SECURITY_PASSWORD_HASH'] = 'bcrypt'
 app.config['SECURITY_PASSWORD_SALT'] = '$2a$$AS6si8daIgfMwkOjGX4SkHqSOPO'
+
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def connect_db():
     """Conexion a BD."""
@@ -60,7 +67,10 @@ def make_salt():
         salt = salt + random.choice(string.ascii_letters)
     return salt
 
-
+def  allowed_file ( filename ): 
+    return  '.'  in  filename  and \
+            filename . rsplit ( '.' ,  1 )[ 1 ]  in  ALLOWED_EXTENSIONS 
+	
 @app.route('/users/<username>/<id>')
 @login_required
 def users(username, id):
@@ -72,10 +82,34 @@ def logout():
 	flash('You were logged out!')
 	return redirect (url_for('log'))
 
-@app.route('/form_agregar', methods=['GET'])
-def form_agregar(): # RECORDAR PASAR LA ID DEL USUARIO!!!
-	return render_template('form.html')
+@app.route('/form_agregar', methods=['POST'])
+def form_agregar(): 
+	id_usuario = request.form['id_oculto']
+	return render_template('form.html', id_usuario=id_usuario) # Se pasa la Pass del Usuario para recordar de quien es la foto!!!
 
+@app.route('/form_agregar_foto', methods=['POST'])
+def form_agregar_foto(): 
+	id_usuario = request.form['id_oculto']
+	titulo_foto = request.form['title']
+	tema_foto = request.form['tema']
+	camara_foto = request.form['camara']
+	description_foto = request.form['description']
+	file = request.files['file_img']
+	if file and allowed_file(file.filename):
+		NombreArchivo = secure_filename(file.filename)
+		file.save(os.path.join(app.config['UPLOAD_FOLDER'], NombreArchivo))
+	
+	archi=open('datos.txt','w')
+	archi.close()
+	archi=open('datos.txt','a')
+	archi.write(id_usuario+'\n')
+	archi.write(titulo_foto+'\n')
+	archi.write(tema_foto+'\n')
+	archi.write(camara_foto+'\n')
+	archi.write(description_foto+'\n')
+	archi.close()
+	return redirect (url_for('log'))	
+	
 @app.route('/form_crear_user', methods=['GET']) #Permite ir al formulario de creacion de usuarios
 def form_crear_user():  
 	return render_template('form_crea_usuario.html')	
