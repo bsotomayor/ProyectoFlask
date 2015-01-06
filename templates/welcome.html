@@ -11,13 +11,13 @@
 			for ( var i = 1; i <= {{cant_fotos}}; i++ ) {
 				if(i==1){
 					$('#tabla_fotos2').find("td").eq(i-1).text(i);
-					var contador = i+7;
+					var contador = i+8;
 				}
 				else{
 					
 					//$('#tabla_fotos2').find("td").eq(i+6).text(i);
 					$('#tabla_fotos2').find("td").eq(contador).text(i);
-					var contador = contador+8;
+					var contador = contador+9;
 				}
 			}
 			
@@ -35,6 +35,20 @@
 			
 			});
 			
+			$('.bt_edit_foto').on("click",function(){
+				var fila = $(this).closest('tr').children('td');
+				var titulo_foto = fila.eq(1).text();
+				$('.class_titulo').val(titulo_foto);	
+				var fecha_subida = fila.eq(2).text();
+				$('.class_fecha').val(fecha_subida);	
+				var tema = fila.eq(3).text();
+				$('.class_tema').val(tema);	
+				var descripcion = fila.eq(4).text();
+				$('.class_descripcion').val(descripcion);	
+				var camara = fila.eq(5).text();
+				$('.class_camara').val(camara);
+			
+			});
 		}); // end ready
 	</script>
 		<div class="hero-unit" align="center">
@@ -69,6 +83,7 @@
 				<th>Descripción</th>
 				<th>Cámara</th>
 				<th>Ver Fotografía</th>
+				<th>Editar Fotografía</th>
 				<th>Eliminar Fotografía</th>
 			</thead>
 			<tbody id = "tabla_fotos2">
@@ -93,7 +108,34 @@
 			</div>
 			</form>
 			</td>
-			<td id ="eliminar_foto">  </td>
+			<td id ="editar_foto">  
+			<form method="post" action="{{ url_for('editar_foto')}}">
+			<input class="bt_edit_foto" id="bt_edit_foto" type="submit" value = "Editar Fotografía "/>
+			<div class="col-sm-10">
+			<input type="text" class="class_titulo" id="camp_titulo_foto" name="titulo_foto" style="display:none;">
+			<input type="text" class="class_fecha" id="camp_fecha_subida"  name="fecha_subida" style="display:none;">
+			<input type="text" class="class_tema" id="camp_tema" name="tema"  style="display:none;">
+			<input type="text" class="class_descripcion" id="camp_descripcion" name="descripcion" style="display:none;">
+			<input type="text" class="class_camara" id="camp_camara" name="camara" style="display:none;">
+			<input type="text" name="id_oculto" value = "{{ id }}" style="display:none;">
+			<input type="text" name="username_oculto" value = "{{ username }}" style="display:none;">
+			</div>
+			</form>
+			</td>
+			<td id ="eliminar_foto">  
+			<form method="post" action="{{ url_for('ver_foto')}}">
+			<input class="bt_elim_foto" id="bt_elim_foto" type="submit" value = "Eliminar Fotografía "/>
+			<div class="col-sm-10">
+			<input type="text" class="class_titulo" id="camp_titulo_foto" name="titulo_foto" style="display:none;">
+			<input type="text" class="class_fecha" id="camp_fecha_subida"  name="fecha_subida" style="display:none;">
+			<input type="text" class="class_tema" id="camp_tema" name="tema"  style="display:none;">
+			<input type="text" class="class_descripcion" id="camp_descripcion" name="descripcion" style="display:none;">
+			<input type="text" class="class_camara" id="camp_camara" name="camara" style="display:none;">
+			<input type="text" name="id_oculto" value = "{{ id }}" style="display:none;">
+			<input type="text" name="username_oculto" value = "{{ username }}" style="display:none;">
+			</div>
+			</form>
+			</td>
 			{% endfor %}
 			</tr>
 			</tbody>

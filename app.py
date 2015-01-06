@@ -81,15 +81,6 @@ def users(username, id):
 	result = db.execute('select nombre, fecha_subida, tema, descripcion, camara from imagen  where id_usuario = ?',[id])
 	matches = result.fetchall()
 	numerito = len(matches)
-	#archi=open('datos.txt','w')
-	#archi.close()
-	#archi=open('datos.txt','a')
-	#user_data = matches[0]
-	#archi.write(user_data[0]+'\n')
-	#archi.write(user_data[1]+'\n')
-	#archi.write(user_data[2]+'\n')
-	#archi.write(user_data[3]+'\n')
-	#archi.write(user_data[4]+'\n')
 	return render_template("welcome.html", username=username, id=id, cant_fotos = numerito, entry = matches)
 
 @app.route('/logout')
@@ -129,6 +120,60 @@ def ver_foto():
 	#fin = open('uploads/'+NombreArchivo, "rb")
 	#fout = open('static/uploads/foto.jpg','wb')
 	
+@app.route('/editar_foto', methods=['POST'])
+def editar_foto(): 
+	titulo_foto = request.form['titulo_foto']
+	fecha_subida = request.form['fecha_subida']
+	tema = request.form['tema']
+	descripcion = request.form['descripcion']
+	camara = request.form['camara']
+	id_usuario = request.form['id_oculto']
+	username = request.form['username_oculto']
+	return render_template('editar_foto.html', id_usuario=id_usuario, username=username, titulo_foto=titulo_foto, fecha_subida=fecha_subida, tema=tema, descripcion=descripcion, camara=camara)
+		
+@app.route('/form_editar_foto', methods=['POST'])
+def form_editar_foto(): 
+	titulo_foto = request.form['title']
+	fecha_subida = request.form['fecha_subida']
+	tema = request.form['tema']
+	descripcion = request.form['description']
+	camara = request.form['camara']
+	id_usuario = request.form['id_oculto']
+	username = request.form['username']
+	file = request.files['file_img']
+	#Ahora se rescatan los valores viejos
+	titulo_viejo = request.form['titulo_viejo']
+	fecha_vieja = request.form['fecha_vieja']
+	tema_viejo = request.form['tema_viejo']
+	descripcion_viejo = request.form['descripcion_viejo']
+	camara_viejo = request.form['camara_viejo']
+	#Se verifica que se ingresan todos los campos,
+	if titulo_foto =="" or tema =="" or descripcion =="" or camara =="": 
+		error = "Debe rellenar todos los espacios."
+		#Se redirige al formulario nuevamente
+		return render_template('editar_foto.html', id_usuario=id_usuario, error=error, username=username, titulo_foto=titulo_viejo, fecha_subida=fecha_vieja, tema=tema_viejo, descripcion=descripcion_viejo,camara=camara_viejo)
+	if file and allowed_file(file.filename):
+		NombreArchivo = secure_filename(file.filename)
+		file.save(os.path.join(app.config['UPLOAD_FOLDER'], NombreArchivo))
+		fin = open('uploads/'+NombreArchivo, "rb")
+		img = fin.read()
+		fin.close()
+		binary = lite.Binary(img)
+		datetime = strftime("%Y-%m-%d %H:%M:%S")
+		db = get_db()
+		c=db.cursor()
+		c.execute("""UPDATE imagen SET nombre=?, fecha_subida=?, tema=?, descripcion=?, camara=?, data=?, nombre_archivo=? WHERE fecha_subida=? and nombre=? and tema=? and descripcion=? and camara=?""",(titulo_foto, datetime, tema, descripcion, camara, binary,NombreArchivo,fecha_vieja,titulo_viejo,tema_viejo,descripcion_viejo,camara_viejo ))
+		db.commit()
+		return redirect(url_for('users',username=username, id=id_usuario))
+	else:
+		error = "No se adjuntó una fotografia."
+		#Se redirige al formulario nuevamente
+		return render_template('editar_foto.html', id_usuario=id_usuario, error=error, username=username, titulo_foto=titulo_foto, fecha_subida=fecha_subida, tema=tema, descripcion=descripcion,camara=camara  )
+	
+	#return render_template('editar_foto.html', id_usuario=id_usuario, username=username, titulo_foto=titulo_foto, fecha_subida=fecha_subida, tema=tema, descripcion=descripcion, camara=camara)
+
+
+		
 @app.route('/form_agregar_foto', methods=['POST'])
 def form_agregar_foto(): 
 	id_usuario = request.form['id_oculto']
@@ -155,14 +200,7 @@ def form_agregar_foto():
 		c=db.cursor()
 		c.execute("insert into imagen (nombre, fecha_subida, tema, descripcion, camara, id_usuario, data, nombre_archivo) values (?, ?, ?, ?, ?,?, ?, ?)",(titulo_foto, datetime, tema_foto, description_foto, camara_foto, id_usuario,binary,NombreArchivo ))
 		db.commit()
-		
-		#con = lite.connect('tarea.db')
-		#cur = con.cursor()    
-		#cur.execute('select data from imagen where id_usuario = ?',[id_usuario])
-		#data = cur.fetchone()[0]
-		#fout = open('woman2.jpg','wb')
-		#fout.write(data)
-		return render_template("welcome.html", id=id_usuario, username=username)
+		return redirect(url_for('users',username=username, id=id_usuario))
 	else:
 		error = "No se adjuntó una fotografia."
 		#Se redirige al formulario nuevamente

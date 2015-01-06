@@ -1,0 +1,59 @@
+
+{% extends "base.html" %} 
+
+{% block title %}Formulario de creación{% endblock title %}
+
+{% block content %}
+		{% if error %}
+		<p align="center" class="error"><strong>Error:</strong> {{ error }} </p>
+		{% endif %}
+		
+		<form method="post" action="{{ url_for('form_editar_foto')}}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title" class="col-sm-2 control-label">Título</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="title" placeholder="{{ titulo_foto }}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="tema" class="col-sm-2 control-label">Tema:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="tema" placeholder="{{ tema }}">
+            </div>
+        </div>
+		<div class="form-group">
+            <label for="description" class="col-sm-2 control-label">Descripción:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="description" placeholder="{{ descripcion }}">
+            </div>
+        </div>
+		<div class="form-group">
+            <label for="camara" class="col-sm-2 control-label">Cámara:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="camara" placeholder="{{ camara }}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="file_img" class="col-sm-2 control-label">Seleccione la imagen</label>
+            <div class="col-sm-10">
+                <input type="file" id="file_img" name="file_img">
+            <div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+            <input type="submit" value="Editar Fotografía" class="btn btn-default">
+            </div>
+        </div>
+		<div class="col-sm-10">
+                <input type="text" name="id_oculto" value = "{{ id_usuario }}" style="display:none;">
+				<input type="text" name="username" value = "{{ username }}" style="display:none;">
+				<input type="text" name="fecha_subida" value = "{{ fecha_subida}}" style="display:none;">
+				<input type="text" class="class_titulo" value="{{titulo_foto}}" id="camp_titulo_foto" name="titulo_viejo" style="display:none;">
+				<input type="text" class="class_fecha" value = "{{ fecha_subida}}"  id="camp_fecha_subida"  name="fecha_vieja" style="display:none;">
+				<input type="text" class="class_tema" value = "{{ tema}}" id="camp_tema" name="tema_viejo"  style="display:none;">
+				<input type="text" class="class_descripcion" value = "{{ descripcion}}" id="camp_descripcion" name="descripcion_viejo" style="display:none;">
+				<input type="text" class="class_camara" value = "{{ camara}}" id="camp_camara" name="camara_viejo" style="display:none;">
+		</div>
+		</form>
+{% endblock content %}
