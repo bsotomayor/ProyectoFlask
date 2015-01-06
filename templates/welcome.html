@@ -4,6 +4,39 @@
 	{% endblock head %}
 
 	{% block content %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			for ( var i = 1; i <= {{cant_fotos}}; i++ ) {
+				if(i==1){
+					$('#tabla_fotos2').find("td").eq(i-1).text(i);
+					var contador = i+7;
+				}
+				else{
+					
+					//$('#tabla_fotos2').find("td").eq(i+6).text(i);
+					$('#tabla_fotos2').find("td").eq(contador).text(i);
+					var contador = contador+8;
+				}
+			}
+			
+			$('.btn_ver_foto').on("click",function(){
+				var fila = $(this).closest('tr').children('td');
+				var titulo_foto = fila.eq(1).text();
+				$('.class_titulo').val(titulo_foto);	
+				var fecha_subida = fila.eq(2).text();
+				$('.class_fecha').val(fecha_subida);	
+				var tema = fila.eq(3).text();
+				$('.class_tema').val(tema);	
+				var descripcion = fila.eq(4).text();
+				$('.class_descripcion').val(descripcion);	
+				
+			
+			});
+			
+		}); // end ready
+	</script>
 		<div class="hero-unit" align="center">
 			{% if username %}
 		    <h4>Bienvenido, <strong> {{ username }} </strong>!</h4>
@@ -26,4 +59,47 @@
 		    <a class="btn btn-primary btn" href="{{ url_for('logout') }}">Logout
 			</a>
 	    </div>
+		
+		<table class="table table-hover table-bordered" padding-left="100" id = "tabla_fotos">
+    		<thead>
+				<th>ID</th>
+				<th>Titulo Foto</th>
+				<th>Fecha Subida</th>
+				<th>Tema</th>
+				<th>Descripción</th>
+				<th>Cámara</th>
+				<th>Ver Fotografía</th>
+				<th>Eliminar Fotografía</th>
+			</thead>
+			<tbody id = "tabla_fotos2">
+			{% for x in entry %}
+			<tr>
+			<td id ="numero_foto"></td>
+			<td id ="titulo_foto">{{ x[0] }}</td>
+			<td id ="fecha_subida">{{ x[1] }}</td>
+			<td id ="tema">{{ x[2] }}</td>
+			<td id ="descripcion">{{ x[3] }}</td>
+			<td id ="camara">{{ x[4] }}</td>
+			<td id ="ver_foto">  
+			<form method="post" action="{{ url_for('ver_foto')}}">
+			<input class="btn_ver_foto" id="bt_ver_foto" type="submit" value = "Ver Fotografia "/>
+			<div class="col-sm-10">
+			<input type="text" class="class_titulo" id="camp_titulo_foto" name="titulo_foto" style="display:none;">
+			<input type="text" class="class_fecha" id="camp_fecha_subida"  name="fecha_subida" style="display:none;">
+			<input type="text" class="class_tema" id="camp_tema" name="tema"  style="display:none;">
+			<input type="text" class="class_descripcion" id="camp_descripcion" name="descripcion" style="display:none;">
+			<input type="text" name="id_oculto" value = "{{ id }}" style="display:none;">
+			<input type="text" name="username_oculto" value = "{{ username }}" style="display:none;">
+			</div>
+			</form>
+			</td>
+			<td id ="eliminar_foto">  </td>
+			{% endfor %}
+			</tr>
+			</tbody>
+    	</table>
+		
+		
+			
+			
 	{% endblock content %}

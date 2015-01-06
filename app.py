@@ -10,6 +10,7 @@ from flask import redirect
 from werkzeug import secure_filename
 import sqlite3 as lite
 from time import gmtime, strftime
+from flask import make_response
 
 app = Flask(__name__)
 
@@ -75,7 +76,21 @@ def  allowed_file ( filename ):
 @app.route('/users/<username>/<id>')
 @login_required
 def users(username, id):
-	return render_template("welcome.html", username=username, id=id)
+	#HACER UN SELECT CON EL ID DEL USUARIO Y RESCATAR LA INFO DE LAS FOTOS
+	db = get_db()
+	result = db.execute('select nombre, fecha_subida, tema, descripcion, camara from imagen  where id_usuario = ?',[id])
+	matches = result.fetchall()
+	numerito = len(matches)
+	#archi=open('datos.txt','w')
+	#archi.close()
+	#archi=open('datos.txt','a')
+	#user_data = matches[0]
+	#archi.write(user_data[0]+'\n')
+	#archi.write(user_data[1]+'\n')
+	#archi.write(user_data[2]+'\n')
+	#archi.write(user_data[3]+'\n')
+	#archi.write(user_data[4]+'\n')
+	return render_template("welcome.html", username=username, id=id, cant_fotos = numerito, entry = matches)
 
 @app.route('/logout')
 def logout():
@@ -89,6 +104,31 @@ def form_agregar():
 	username = request.form['username_oculto']
 	return render_template('form.html', id_usuario=id_usuario, username=username) # Se pasa la Pass del Usuario para recordar de quien es la foto!!!
 
+@app.route('/ver_foto', methods=['POST'])
+def ver_foto(): 
+	titulo_foto = request.form['titulo_foto']
+	fecha_subida = request.form['fecha_subida']
+	tema = request.form['tema']
+	descripcion = request.form['descripcion']
+	id_usuario = request.form['id_oculto']
+	username = request.form['username_oculto']
+	con = lite.connect('tarea.db')
+	cur = con.cursor()
+	cur.execute('select data from imagen where nombre = ? and fecha_subida = ? and tema = ? and descripcion = ?',[titulo_foto, fecha_subida, tema, descripcion])
+	con.commit()
+	#con.close()
+	data = cur.fetchone()[0]
+	#fout = open('static/uploads/foto.jpg','wb')
+	fout = open('static/uploads/'+titulo_foto+tema+id_usuario+'.jpg','wb')
+	filename = 'uploads/'+titulo_foto+tema+id_usuario+'.jpg'
+	fout.write(data)
+	fout.close()
+	return '<img src=' + url_for('static',filename=filename) + '>' 
+	#return render_template("ver_foto.html", titulo_foto=titulo_foto, username=username, id=id_usuario, tema=tema, filename = filename)
+	#return render_template("ver_foto.html", titulo_foto=titulo_foto, username=username, id=id_usuario, tema=tema)
+	#fin = open('uploads/'+NombreArchivo, "rb")
+	#fout = open('static/uploads/foto.jpg','wb')
+	
 @app.route('/form_agregar_foto', methods=['POST'])
 def form_agregar_foto(): 
 	id_usuario = request.form['id_oculto']
@@ -115,6 +155,7 @@ def form_agregar_foto():
 		c=db.cursor()
 		c.execute("insert into imagen (nombre, fecha_subida, tema, descripcion, camara, id_usuario, data, nombre_archivo) values (?, ?, ?, ?, ?,?, ?, ?)",(titulo_foto, datetime, tema_foto, description_foto, camara_foto, id_usuario,binary,NombreArchivo ))
 		db.commit()
+		
 		#con = lite.connect('tarea.db')
 		#cur = con.cursor()    
 		#cur.execute('select data from imagen where id_usuario = ?',[id_usuario])
@@ -171,16 +212,16 @@ def crea_usuario():
 		c=db.cursor()
 		c.execute("insert into user (name, user, pass, salt, pais, email) values (?, ?, ?, ?, ?,?)",(nombre, nombreusuario, Password, salt, Pais, email))
 		db.commit()
-		archi=open('datos.txt','w')
-		archi.close()
-		archi=open('datos.txt','a')
-		archi.write(nombre+'\n')
-		archi.write(nombreusuario+'\n')
-		archi.write(Password+'\n')
-		archi.write(Pais+'\n')
-		archi.write(salt+'\n')
-		archi.write(email+'\n')
-		archi.close()
+		#archi=open('datos.txt','w')
+		#archi.close()
+		#archi=open('datos.txt','a')
+		#archi.write(nombre+'\n')
+		#archi.write(nombreusuario+'\n')
+		#archi.write(Password+'\n')
+		#archi.write(Pais+'\n')
+		#archi.write(salt+'\n')
+		#archi.write(email+'\n')
+		#archi.close()
 		#return render_template('log.html')
 		return redirect (url_for('log'))
 	
