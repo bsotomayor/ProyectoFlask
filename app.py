@@ -12,6 +12,7 @@ import sqlite3 as lite
 from time import gmtime, strftime
 from flask import make_response
 
+
 app = Flask(__name__)
 
 app.config.update(dict(
@@ -81,6 +82,13 @@ def users(username, id):
 	result = db.execute('select nombre, fecha_subida, tema, descripcion, camara from imagen  where id_usuario = ?',[id])
 	matches = result.fetchall()
 	numerito = len(matches)
+	folder_path = 'static/uploads'
+	for file_object in os.listdir(folder_path): #Comienzo Borrar archivos temporales
+		file_object_path = os.path.join(folder_path, file_object)
+		if os.path.isfile(file_object_path):
+			os.unlink(file_object_path)
+		else:
+			shutil.rmtree(file_object_path) #Fin Borrar archivos temporales
 	return render_template("welcome.html", username=username, id=id, cant_fotos = numerito, entry = matches)
 
 @app.route('/logout')
@@ -92,7 +100,7 @@ def logout():
 @app.route('/form_agregar', methods=['POST'])
 def form_agregar(): 
 	id_usuario = request.form['id_oculto']
-	username = request.form['username_oculto']
+	username = request.form['username']
 	return render_template('form.html', id_usuario=id_usuario, username=username) # Se pasa la Pass del Usuario para recordar de quien es la foto!!!
 
 @app.route('/ver_foto', methods=['POST'])
@@ -105,20 +113,16 @@ def ver_foto():
 	username = request.form['username_oculto']
 	con = lite.connect('tarea.db')
 	cur = con.cursor()
+	newdatetime = fecha_subida.replace(":", "")
 	cur.execute('select data from imagen where nombre = ? and fecha_subida = ? and tema = ? and descripcion = ?',[titulo_foto, fecha_subida, tema, descripcion])
 	con.commit()
-	#con.close()
 	data = cur.fetchone()[0]
-	#fout = open('static/uploads/foto.jpg','wb')
-	fout = open('static/uploads/'+titulo_foto+tema+id_usuario+'.jpg','wb')
-	filename = 'uploads/'+titulo_foto+tema+id_usuario+'.jpg'
+	fout = open('static/uploads/'+titulo_foto+tema+id_usuario+newdatetime+'.jpg','wb')
+	filename = 'uploads/'+titulo_foto+tema+id_usuario+newdatetime+'.jpg'
 	fout.write(data)
 	fout.close()
 	return '<img src=' + url_for('static',filename=filename) + '>' 
-	#return render_template("ver_foto.html", titulo_foto=titulo_foto, username=username, id=id_usuario, tema=tema, filename = filename)
-	#return render_template("ver_foto.html", titulo_foto=titulo_foto, username=username, id=id_usuario, tema=tema)
-	#fin = open('uploads/'+NombreArchivo, "rb")
-	#fout = open('static/uploads/foto.jpg','wb')
+	
 	
 @app.route('/editar_foto', methods=['POST'])
 def editar_foto(): 
@@ -164,15 +168,83 @@ def form_editar_foto():
 		c=db.cursor()
 		c.execute("""UPDATE imagen SET nombre=?, fecha_subida=?, tema=?, descripcion=?, camara=?, data=?, nombre_archivo=? WHERE fecha_subida=? and nombre=? and tema=? and descripcion=? and camara=?""",(titulo_foto, datetime, tema, descripcion, camara, binary,NombreArchivo,fecha_vieja,titulo_viejo,tema_viejo,descripcion_viejo,camara_viejo ))
 		db.commit()
+		folder_path = 'uploads'
+		for file_object in os.listdir(folder_path): #Comienzo Borrar archivos temporales
+			file_object_path = os.path.join(folder_path, file_object)
+			if os.path.isfile(file_object_path):
+				os.unlink(file_object_path)
+			else:
+				shutil.rmtree(file_object_path) #Fin Borrar archivos temporales
 		return redirect(url_for('users',username=username, id=id_usuario))
 	else:
 		error = "No se adjuntó una fotografia."
 		#Se redirige al formulario nuevamente
-		return render_template('editar_foto.html', id_usuario=id_usuario, error=error, username=username, titulo_foto=titulo_foto, fecha_subida=fecha_subida, tema=tema, descripcion=descripcion,camara=camara  )
+		return render_template('editar_foto.html', id_usuario=id_usuario, error=error, username=username, titulo_foto=titulo_viejo, fecha_subida=fecha_vieja, tema=tema_viejo, descripcion=descripcion_viejo,camara=camara_viejo  )
 	
-	#return render_template('editar_foto.html', id_usuario=id_usuario, username=username, titulo_foto=titulo_foto, fecha_subida=fecha_subida, tema=tema, descripcion=descripcion, camara=camara)
+@app.route('/editar_usuario', methods=['POST'])
+def editar_usuario(): 
+	id_usuario = request.form['id_oculto']
+	username = request.form['username']
+	return render_template('form_edita_usuario.html', id=id_usuario, username=username)
 
+@app.route("/form_edita_usuario/", methods=['POST'])
+def form_edita_usuario():
+	error = None
+	nombre = request.form['Nombre']
+	nombreusuario = request.form['Username']
+	email = request.form['email']
+	Password = request.form['Password']
+	Pais = request.form['Pais']
+	id_oculto = request.form['id_oculto']
+	username_oculto = request.form['username_oculto']
+	#Info Necesaria para verificar nombre de usuario
+	db = get_db()
+	result = db.execute('select user from user where user = ?',[nombreusuario])
+	matches = result.fetchall()
+	#Info Necesaria para verificar email de usuario
+	db = get_db()
+	result = db.execute('select email from user where email = ?',[email])
+	matches2 = result.fetchall()
+	#Se verifica que se ingresan todos los campos,
+	if nombre =="" or nombreusuario =="" or Password =="" or Pais =="" or email=="": 
+		error = "Debe rellenar todos los espacios."
+		#Se redirige al formulario nuevamente
+		return render_template('form_edita_usuario.html', error=error, username=username_oculto, id=id_oculto)
+	#Se verifica si el nombre de usuario ya existe en la DB
+	elif len(matches) > 0:
+		error = "Usuario ya existe, intente con otro nombre de usuario."
+		#Se redirige al formulario nuevamente
+		return render_template('form_edita_usuario.html', error=error)
+	#Se verifica si el email ya existe en la DB
+	elif len(matches2) > 0:
+		error = "El email ingresado ya posee una cuenta asociada."
+		#Se redirige al formulario nuevamente
+		return render_template('form_edita_usuario.html', error=error)
+	else:
+		#Encriptacion de la password
+		salt = make_salt()
+		Password = Password+salt
+		Password = hashlib.sha224(Password.encode('utf-8')).hexdigest()		
+		db = get_db()
+		c=db.cursor()
+		c.execute("""UPDATE user SET name=?, user=?, pass=?, salt=?, pais=?, email=? WHERE id=?""",(nombre, nombreusuario, Password, salt, Pais, email,id_oculto))
+		db.commit()
+		return redirect (url_for('log'))
 
+@app.route('/eliminar_foto', methods=['POST'])
+def eliminar_foto(): 
+	titulo_foto = request.form['titulo_foto']
+	fecha_subida = request.form['fecha_subida']
+	tema = request.form['tema']
+	descripcion = request.form['descripcion']
+	camara = request.form['camara']
+	id_usuario = request.form['id_oculto']
+	username = request.form['username_oculto']
+	db = get_db()
+	c=db.cursor()
+	c.execute('DELETE FROM imagen WHERE fecha_subida=?',(fecha_subida,))
+	db.commit()
+	return redirect(url_for('users',username=username, id=id_usuario))
 		
 @app.route('/form_agregar_foto', methods=['POST'])
 def form_agregar_foto(): 
@@ -187,7 +259,7 @@ def form_agregar_foto():
 	if titulo_foto =="" or tema_foto =="" or description_foto =="" or camara_foto =="": 
 		error = "Debe rellenar todos los espacios."
 		#Se redirige al formulario nuevamente
-		return render_template('form.html', id_usuario=id_usuario, error=error)
+		return render_template('form.html', id_usuario=id_usuario, error=error, username=username)
 	if file and allowed_file(file.filename):
 		NombreArchivo = secure_filename(file.filename)
 		file.save(os.path.join(app.config['UPLOAD_FOLDER'], NombreArchivo))
@@ -200,11 +272,18 @@ def form_agregar_foto():
 		c=db.cursor()
 		c.execute("insert into imagen (nombre, fecha_subida, tema, descripcion, camara, id_usuario, data, nombre_archivo) values (?, ?, ?, ?, ?,?, ?, ?)",(titulo_foto, datetime, tema_foto, description_foto, camara_foto, id_usuario,binary,NombreArchivo ))
 		db.commit()
+		folder_path = 'uploads'
+		for file_object in os.listdir(folder_path): #Comienzo Borrar archivos temporales
+			file_object_path = os.path.join(folder_path, file_object)
+			if os.path.isfile(file_object_path):
+				os.unlink(file_object_path)
+			else:
+				shutil.rmtree(file_object_path) #Fin Borrar archivos temporales
 		return redirect(url_for('users',username=username, id=id_usuario))
 	else:
 		error = "No se adjuntó una fotografia."
 		#Se redirige al formulario nuevamente
-		return render_template('form.html', id_usuario=id_usuario, error=error)
+		return render_template('form.html', id_usuario=id_usuario, error=error, username=username)
 	
 @app.route('/form_crear_user', methods=['GET']) #Permite ir al formulario de creacion de usuarios
 def form_crear_user():  

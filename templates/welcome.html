@@ -49,13 +49,36 @@
 				$('.class_camara').val(camara);
 			
 			});
+			
+				$('.bt_elim_foto').on("click",function(){
+				var fila = $(this).closest('tr').children('td');
+				var titulo_foto = fila.eq(1).text();
+				$('.class_titulo').val(titulo_foto);	
+				var fecha_subida = fila.eq(2).text();
+				$('.class_fecha').val(fecha_subida);	
+				var tema = fila.eq(3).text();
+				$('.class_tema').val(tema);	
+				var descripcion = fila.eq(4).text();
+				$('.class_descripcion').val(descripcion);	
+				var camara = fila.eq(5).text();
+				$('.class_camara').val(camara);
+			
+			});
+			
 		}); // end ready
 	</script>
 		<div class="hero-unit" align="center">
 			{% if username %}
 		    <h4>Bienvenido, <strong> {{ username }} </strong>!</h4>
 		    {% endif %}
-			
+			<form method="post" action="{{ url_for('editar_usuario')}}">
+				<input type="submit" value = "Editar Perfil"/>
+				<br>
+				<div class="col-sm-10">
+                <input type="text" name="id_oculto" value = "{{ id }}" style="display:none;">
+				<input type="text" name="username" value = "{{ username }}" style="display:none;">
+				</div>
+			</form>
 		    <br/>
 		    <img src="http://flask.pocoo.org/docs/0.10/_static/flask.png">
 			<br>
@@ -64,7 +87,7 @@
 				<br>
 				<div class="col-sm-10">
                 <input type="text" name="id_oculto" value = "{{ id }}" style="display:none;">
-				<input type="text" name="username_oculto" value = "{{ username }}" style="display:none;">
+				<input type="text" name="username" value = "{{ username }}" style="display:none;">
 				</div>
 			</form>
 		    <br/><br/><br/>
@@ -123,7 +146,7 @@
 			</form>
 			</td>
 			<td id ="eliminar_foto">  
-			<form method="post" action="{{ url_for('ver_foto')}}">
+			<form method="post" action="{{ url_for('eliminar_foto')}}">
 			<input class="bt_elim_foto" id="bt_elim_foto" type="submit" value = "Eliminar Fotografía "/>
 			<div class="col-sm-10">
 			<input type="text" class="class_titulo" id="camp_titulo_foto" name="titulo_foto" style="display:none;">

@@ -1,0 +1,52 @@
+
+{% extends "base.html" %} 
+
+{% block title %}Formulario de creación{% endblock title %}
+
+{% block content %}
+	<div>
+	{% if error %}
+		<p align="center" class="error"><strong>Error:</strong> {{ error }} </p>
+	{% endif %}
+	</div>
+	<form method="post" action="{{ url_for('form_edita_usuario') }}">
+        <div class="form-group">
+            <label for="Nombre" class="col-sm-2 control-label">Nombre</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="Nombre" placeholder="Ingrese su nombre Real.">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Username" class="col-sm-2 control-label">Username:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="Username" placeholder="Nombre de usuario con el cual hará Log In">
+            </div>
+        </div>
+		<div class="form-group">
+            <label for="Password" class="col-sm-2 control-label">Password:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="password" name="Password" placeholder="Ingrese su Password">
+            </div>
+        </div>
+		<div class="form-group">
+            <label for="email" class="col-sm-2 control-label">Correo Electrónico:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="email" placeholder="Ingrese su Correo Electrónico">
+            </div>
+        </div>
+		<div class="form-group">
+            <label for="Pais" class="col-sm-2 control-label">País:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="Pais" placeholder="Ingrese su pais de residencia">
+            </div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+            <input type="submit" value="Editar Usuario" class="btn btn-default">
+            </div>
+        </div>
+		<input type="text" name="id_oculto" value = "{{ id }}" style="display:none;">
+		<input type="text" name="username_oculto" value = "{{ username }}" style="display:none;">
+	</form>
+{% endblock content %}
