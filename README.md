@@ -2,14 +2,18 @@
 
 ************************************************************
 |	 Integrante		 |	          Email					   |
+|					 |									   |
 |	Boris Sotomayor	 |	bsotomayor92@gmail.com 			   |
-|   Enrique Riquelme |	enrique.riquelme.bracho@gmail.com  | 
+|					 |									   |
+|   Enrique Riquelme |	enrique.riquelme.bracho@gmail.com  |
+| 					 |									   |
 |	Ahmed Chávez	 |	ahmedtaufikch@hotmail.com		   |
 ************************************************************
  
  *Visión General
  
  -Filosofía.
+ 
  PyTax! se centra en la necesidad de que cada persona pueda almacenar sus fotografías en un sitio seguro y que además pueda
  almacenar información relevante como que cámara se utilizó, el tema de la foto o una descripción de la misma.
  
