@@ -1,14 +1,14 @@
 ¡PyTax!: Guarda tus recuerdos!
 
-************************************************************
-|	 Integrante		 |	          Email					   |
-|					 |									   |
-|	Boris Sotomayor	 |	bsotomayor92@gmail.com 			   |
-|					 |									   |
-|   Enrique Riquelme |	enrique.riquelme.bracho@gmail.com  |
-| 					 |									   |
-|	Ahmed Chávez	 |	ahmedtaufikch@hotmail.com		   |
-************************************************************
+
+Integrantes
+
+Boris Sotomayor	 |	bsotomayor92@gmail.com 			   
+					 									   
+Enrique Riquelme |	enrique.riquelme.bracho@gmail.com  
+ 					 									   
+Ahmed Chávez	 |	ahmedtaufikch@hotmail.com		   
+
  
  *Visión General
  
