@@ -24,7 +24,7 @@ app.config.update(dict(
 app.config['SECURITY_PASSWORD_HASH'] = 'bcrypt'
 app.config['SECURITY_PASSWORD_SALT'] = '$2a$$AS6si8daIgfMwkOjGX4SkHqSOPO'
 
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'Login/uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -82,7 +82,7 @@ def users(username, id):
 	result = db.execute('select nombre, fecha_subida, tema, descripcion, camara from imagen  where id_usuario = ?',[id])
 	matches = result.fetchall()
 	numerito = len(matches)
-	folder_path = 'static/uploads'
+	folder_path = 'Login/static/uploads'
 	for file_object in os.listdir(folder_path): #Comienzo Borrar archivos temporales
 		file_object_path = os.path.join(folder_path, file_object)
 		if os.path.isfile(file_object_path):
@@ -117,7 +117,7 @@ def ver_foto():
 	cur.execute('select data from imagen where nombre = ? and fecha_subida = ? and tema = ? and descripcion = ?',[titulo_foto, fecha_subida, tema, descripcion])
 	con.commit()
 	data = cur.fetchone()[0]
-	fout = open('static/uploads/'+titulo_foto+tema+id_usuario+newdatetime+'.jpg','wb')
+	fout = open('Login/static/uploads/'+titulo_foto+tema+id_usuario+newdatetime+'.jpg','wb')
 	filename = 'uploads/'+titulo_foto+tema+id_usuario+newdatetime+'.jpg'
 	fout.write(data)
 	fout.close()
@@ -159,7 +159,7 @@ def form_editar_foto():
 	if file and allowed_file(file.filename):
 		NombreArchivo = secure_filename(file.filename)
 		file.save(os.path.join(app.config['UPLOAD_FOLDER'], NombreArchivo))
-		fin = open('uploads/'+NombreArchivo, "rb")
+		fin = open('Login/uploads/'+NombreArchivo, "rb")
 		img = fin.read()
 		fin.close()
 		binary = lite.Binary(img)
@@ -168,7 +168,7 @@ def form_editar_foto():
 		c=db.cursor()
 		c.execute("""UPDATE imagen SET nombre=?, fecha_subida=?, tema=?, descripcion=?, camara=?, data=?, nombre_archivo=? WHERE fecha_subida=? and nombre=? and tema=? and descripcion=? and camara=?""",(titulo_foto, datetime, tema, descripcion, camara, binary,NombreArchivo,fecha_vieja,titulo_viejo,tema_viejo,descripcion_viejo,camara_viejo ))
 		db.commit()
-		folder_path = 'uploads'
+		folder_path = 'Login/uploads'
 		for file_object in os.listdir(folder_path): #Comienzo Borrar archivos temporales
 			file_object_path = os.path.join(folder_path, file_object)
 			if os.path.isfile(file_object_path):
@@ -263,7 +263,7 @@ def form_agregar_foto():
 	if file and allowed_file(file.filename):
 		NombreArchivo = secure_filename(file.filename)
 		file.save(os.path.join(app.config['UPLOAD_FOLDER'], NombreArchivo))
-		fin = open('uploads/'+NombreArchivo, "rb")
+		fin = open('Login/uploads/'+NombreArchivo, "rb")
 		img = fin.read()
 		fin.close()
 		binary = lite.Binary(img)
@@ -272,7 +272,7 @@ def form_agregar_foto():
 		c=db.cursor()
 		c.execute("insert into imagen (nombre, fecha_subida, tema, descripcion, camara, id_usuario, data, nombre_archivo) values (?, ?, ?, ?, ?,?, ?, ?)",(titulo_foto, datetime, tema_foto, description_foto, camara_foto, id_usuario,binary,NombreArchivo ))
 		db.commit()
-		folder_path = 'uploads'
+		folder_path = 'Login/uploads'
 		for file_object in os.listdir(folder_path): #Comienzo Borrar archivos temporales
 			file_object_path = os.path.join(folder_path, file_object)
 			if os.path.isfile(file_object_path):
